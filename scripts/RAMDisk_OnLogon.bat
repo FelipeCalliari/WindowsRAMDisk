@@ -316,7 +316,8 @@ IF EXIST "%LOCALAPPDATA%\Steam\htmlcache" (
 )
 
 @ECHO.
-timeout /T 10
+:: << for debug >>
+::timeout /T 10
 
 GOTO :EOF
 

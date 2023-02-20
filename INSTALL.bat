@@ -180,14 +180,14 @@ set CMD_TO_PWSH=%RAMDiskDestination%RAMDisk_SavePersistent.bat
  "$xml.Task.Actions.Exec.Command=\"$env:CMD_TO_PWSH\";"^
  "$xml.Save('RAMDisk_SavePersistentData_EveryXmin.xml')"
 
-schtasks /Query /TN "RAMDisk_SavePersistentData_EveryXmin" >nul
+schtasks /Query /TN "\RAMDisk\SavePersistentData_EveryXmin" >nul
 
 IF %ERRORLEVEL% equ 0 (
-  schtasks /Delete /TN "RAMDisk_SavePersistentData_EveryXmin" /F >nul
+  schtasks /Delete /TN "\RAMDisk\SavePersistentData_EveryXmin" /F >nul
 )
-schtasks /Create /TN "RAMDisk_SavePersistentData_EveryXmin" /xml "%STARTDIR%RAMDisk_SavePersistentData_EveryXmin.xml" >nul
+schtasks /Create /TN "\RAMDisk\SavePersistentData_EveryXmin" /xml "%STARTDIR%RAMDisk_SavePersistentData_EveryXmin.xml" >nul
 
-schtasks /Run /TN "RAMDisk_SavePersistentData_EveryXmin" >nul
+schtasks /Run /TN "\RAMDisk\SavePersistentData_EveryXmin" >nul
 
 del RAMDisk_SavePersistentData_EveryXmin.xml /F >nul 2>nul
 
@@ -201,14 +201,14 @@ set CMD_TO_PWSH=%RAMDiskDestination%RAMDisk_SavePersistent.bat
  "$xml.Task.Actions.Exec.Command=\"$env:CMD_TO_PWSH\";"^
  "$xml.Save('RAMDisk_SavePersistentData_OnEvent.xml')"
 
-schtasks /Query /TN "RAMDisk_SavePersistentData_OnEvent" >nul
+schtasks /Query /TN "\RAMDisk\SavePersistentData_OnEvent" >nul
 
 IF %ERRORLEVEL% equ 0 (
-  schtasks /Delete /TN "RAMDisk_SavePersistentData_OnEvent" /F >nul
+  schtasks /Delete /TN "\RAMDisk\SavePersistentData_OnEvent" /F >nul
 )
-schtasks /Create /TN "RAMDisk_SavePersistentData_OnEvent" /xml "%STARTDIR%RAMDisk_SavePersistentData_OnEvent.xml" >nul
+schtasks /Create /TN "\RAMDisk\SavePersistentData_OnEvent" /xml "%STARTDIR%RAMDisk_SavePersistentData_OnEvent.xml" >nul
 
-schtasks /Run /TN "RAMDisk_SavePersistentData_OnEvent" >nul
+schtasks /Run /TN "\RAMDisk\SavePersistentData_OnEvent" >nul
 
 del RAMDisk_SavePersistentData_OnEvent.xml /F >nul 2>nul
 
@@ -222,15 +222,15 @@ set CMD_TO_PWSH=%RAMDiskDestination%RAMDisk_OnLogon.bat
  "$xml.Task.Actions.Exec.Command=\"$env:CMD_TO_PWSH\";"^
  "$xml.Save('RAMDisk_OnLogonStart.xml')"
 
-schtasks /Query /TN "RAMDisk_OnLogonStart" >nul
+schtasks /Query /TN "\RAMDisk\OnLogonStart" >nul
 
 IF %ERRORLEVEL% equ 0 (
-  schtasks /Delete /TN "RAMDisk_OnLogonStart" /F >nul
+  schtasks /Delete /TN "\RAMDisk\OnLogonStart" /F >nul
 )
 
-schtasks /Create /TN "RAMDisk_OnLogonStart" /xml "%STARTDIR%RAMDisk_OnLogonStart.xml" >nul
+schtasks /Create /TN "\RAMDisk\OnLogonStart" /xml "%STARTDIR%RAMDisk_OnLogonStart.xml" >nul
 
-schtasks /Run /TN "RAMDisk_OnLogonStart" >nul
+schtasks /Run /TN "\RAMDisk\OnLogonStart" >nul
 
 del RAMDisk_OnLogonStart.xml /F >nul 2>nul
 
