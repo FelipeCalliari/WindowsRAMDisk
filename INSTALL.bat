@@ -107,6 +107,8 @@ if not exist "%ProgramFiles%\OSFMount\OSFMount.exe" (
 :: Check settings.ini
 :: -------------------------------
 
+cd %STARTDIR%
+
 set RAMDiskUseUserProfile=TRUE
 set RAMDiskDestination=
 
@@ -167,6 +169,9 @@ call "%RAMDiskDestination%RAMDisk_SavePersistent.bat"
 :: Create Tasks
 :: -------------------------------
 
+::@ECHO.
+::@ECHO %ESC%[101;93m%ESC%[1L [CurrentFolder] %STARTDIR% %ESC%[0m
+
 @ECHO.
 @ECHO %ESC%[101;93m%ESC%[1L [Tasks] %ESC%[0m
 
@@ -176,9 +181,13 @@ call "%RAMDiskDestination%RAMDisk_SavePersistent.bat"
 
 set CMD_TO_PWSH=%RAMDiskDestination%RAMDisk_SavePersistent.bat
 
-@powershell.exe -NoProfile "[xml]$xml = Get-Content 'tasks/TEMPLATE_SAVE_PERSISTENT_EVERYXMIN.xml' -Raw;"^
+@powershell.exe -NoProfile "Set-Location $env:STARTDIR;"^
+ "$currentFolder = PWD;"^
+ "$target = Join-Path $currentFolder.Path tasks/TEMPLATE_SAVE_PERSISTENT_EVERYXMIN.xml;"^
+ "$output = Join-Path $currentFolder.Path RAMDisk_SavePersistentData_EveryXmin.xml;"^
+ "[xml]$xml = Get-Content $target -Raw;"^
  "$xml.Task.Actions.Exec.Command=\"$env:CMD_TO_PWSH\";"^
- "$xml.Save('RAMDisk_SavePersistentData_EveryXmin.xml')"
+ "$xml.Save($output)"
 
 schtasks /Query /TN "\RAMDisk\SavePersistentData_EveryXmin" >nul
 
@@ -189,7 +198,7 @@ schtasks /Create /TN "\RAMDisk\SavePersistentData_EveryXmin" /xml "%STARTDIR%RAM
 
 schtasks /Run /TN "\RAMDisk\SavePersistentData_EveryXmin" >nul
 
-del RAMDisk_SavePersistentData_EveryXmin.xml /F >nul 2>nul
+::del RAMDisk_SavePersistentData_EveryXmin.xml /F >nul 2>nul
 
 :: SavePersistent: OnLogOn/OnLogoff/OnShutdown
 
@@ -197,9 +206,13 @@ del RAMDisk_SavePersistentData_EveryXmin.xml /F >nul 2>nul
 
 set CMD_TO_PWSH=%RAMDiskDestination%RAMDisk_SavePersistent.bat
 
-@powershell.exe -NoProfile "[xml]$xml = Get-Content 'tasks/TEMPLATE_SAVE_PERSISTENT_ONEVENT.xml' -Raw;"^
+@powershell.exe -NoProfile "Set-Location $env:STARTDIR;"^
+ "$currentFolder = PWD;"^
+ "$target = Join-Path $currentFolder.Path tasks/TEMPLATE_SAVE_PERSISTENT_ONEVENT.xml;"^
+ "$output = Join-Path $currentFolder.Path RAMDisk_SavePersistentData_OnEvent.xml;"^
+ "[xml]$xml = Get-Content $target -Raw;"^
  "$xml.Task.Actions.Exec.Command=\"$env:CMD_TO_PWSH\";"^
- "$xml.Save('RAMDisk_SavePersistentData_OnEvent.xml')"
+ "$xml.Save($output)"
 
 schtasks /Query /TN "\RAMDisk\SavePersistentData_OnEvent" >nul
 
@@ -210,7 +223,7 @@ schtasks /Create /TN "\RAMDisk\SavePersistentData_OnEvent" /xml "%STARTDIR%RAMDi
 
 schtasks /Run /TN "\RAMDisk\SavePersistentData_OnEvent" >nul
 
-del RAMDisk_SavePersistentData_OnEvent.xml /F >nul 2>nul
+::del RAMDisk_SavePersistentData_OnEvent.xml /F >nul 2>nul
 
 :: OnLogon
 
@@ -218,9 +231,13 @@ del RAMDisk_SavePersistentData_OnEvent.xml /F >nul 2>nul
 
 set CMD_TO_PWSH=%RAMDiskDestination%RAMDisk_OnLogon.bat
 
-@powershell.exe -NoProfile "[xml]$xml = Get-Content 'tasks/TEMPLATE_ON_LOGON.xml' -Raw;"^
+@powershell.exe -NoProfile "Set-Location $env:STARTDIR;"^
+ "$currentFolder = PWD;"^
+ "$target = Join-Path $currentFolder.Path tasks/TEMPLATE_ON_LOGON.xml;"^
+ "$output = Join-Path $currentFolder.Path RAMDisk_OnLogonStart.xml;"^
+ "[xml]$xml = Get-Content $target -Raw;"^
  "$xml.Task.Actions.Exec.Command=\"$env:CMD_TO_PWSH\";"^
- "$xml.Save('RAMDisk_OnLogonStart.xml')"
+ "$xml.Save($output)"
 
 schtasks /Query /TN "\RAMDisk\OnLogonStart" >nul
 
@@ -232,7 +249,7 @@ schtasks /Create /TN "\RAMDisk\OnLogonStart" /xml "%STARTDIR%RAMDisk_OnLogonStar
 
 schtasks /Run /TN "\RAMDisk\OnLogonStart" >nul
 
-del RAMDisk_OnLogonStart.xml /F >nul 2>nul
+::del RAMDisk_OnLogonStart.xml /F >nul 2>nul
 
 :: PRINT BANNER
 ECHO.
@@ -242,6 +259,7 @@ ECHO %ESC%[102;97m    Windows RAMDisk installed..
 ECHO.
 ECHO %ESC%[0m
 
+::pause
 timeout /t 5
 
 GOTO :EOF

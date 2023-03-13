@@ -61,9 +61,15 @@ call :get-ini %STARTDIR%settings.ini settings autosave result
 ::echo RAMDiskPersistent=%RAMDiskPersistent%
 ::timeout /t 1
 
-IF /i "%RAMDiskAutoSave%"=="TRUE" ( CALL :CopyToPersistent )
+set "PersistentEnabled=false"
 
-IF /i "%RAMDiskPersistent%"=="TRUE" ( CALL :CopyToPersistent ) ELSE (
+IF /i "%RAMDiskAutoSave%"=="TRUE" ( set "PersistentEnabled=true" )
+IF /i "%RAMDiskPersistent%"=="TRUE" ( set "PersistentEnabled=true" )
+
+IF /i "%PersistentEnabled%"=="TRUE" (
+  @ECHO %ESC%[101;93m%ESC%[1L Saving persistent data %ESC%[0m
+  CALL :CopyToPersistent
+) ELSE (
   @ECHO %ESC%[101;93m%ESC%[1L [RAMDisk] Save Persistent is disabled! %ESC%[0m
 )
 
@@ -79,32 +85,32 @@ GOTO :EOF
 
 IF EXIST "%LOCALAPPDATA%\Google\Chrome\User Data\Default\" (
   @ECHO %ESC%[101;93m%ESC%[1L [Google Chrome] Copying persistent data.. %ESC%[0m
-  CALL :CopyPersistentDataFromTo "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Chrome\Network" >NUL
+  CALL :CopyPersistentFromTo "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Chrome\Network" 
 )
 
 IF EXIST "%LOCALAPPDATA%\Google\Chrome Beta\User Data\Default\" (
   @ECHO %ESC%[101;93m%ESC%[1L [Google Chrome Beta] Copying persistent data.. %ESC%[0m
-  CALL :CopyPersistentDataFromTo "%LOCALAPPDATA%\Google\Chrome Beta\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Chrome Beta\Network" >NUL
+  CALL :CopyPersistentFromTo "%LOCALAPPDATA%\Google\Chrome Beta\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Chrome Beta\Network" >NUL
 )
 
 IF EXIST "%LOCALAPPDATA%\Google\Chrome Dev\User Data\Default\" (
   @ECHO %ESC%[101;93m%ESC%[1L [Google Chrome Dev] Copying persistent data.. %ESC%[0m
-  CALL :CopyPersistentDataFromTo "%LOCALAPPDATA%\Google\Chrome Dev\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Chrome Dev\Network" >NUL
+  CALL :CopyPersistentFromTo "%LOCALAPPDATA%\Google\Chrome Dev\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Chrome Dev\Network" >NUL
 )
 
 IF EXIST "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\" (
   @ECHO %ESC%[101;93m%ESC%[1L [Microsoft Edge] Copying persistent data.. %ESC%[0m
-  CALL :CopyPersistentDataFromTo "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Edge\Network" >NUL
+  CALL :CopyPersistentFromTo "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Edge\Network" >NUL
 )
 
 IF EXIST "%LOCALAPPDATA%\Opera Software\Opera Stable" (
   @ECHO %ESC%[101;93m%ESC%[1L [Opera] Copying persistent data.. %ESC%[0m
-  CALL :CopyPersistentDataFromTo "%APPDATA%\Opera Software\Opera Stable\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Opera\Network" >NUL
+  CALL :CopyPersistentFromTo "%APPDATA%\Opera Software\Opera Stable\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\Opera\Network" >NUL
 )
 
 IF EXIST "%LOCALAPPDATA%\Opera Software\Opera GX Stable" (
   @ECHO %ESC%[101;93m%ESC%[1L [Opera GX] Copying persistent data.. %ESC%[0m
-  CALL :CopyPersistentDataFromTo "%APPDATA%\Opera Software\Opera GX Stable\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\OperaGX\Network" >NUL
+  CALL :CopyPersistentFromTo "%APPDATA%\Opera Software\Opera GX Stable\Network" "%LOCALAPPDATA:\=/%/WRamdisk/persistent\OperaGX\Network" >NUL
 )
 
 IF EXIST "%LOCALAPPDATA%\Mozilla\Firefox\Profiles" (
@@ -125,6 +131,7 @@ IF EXIST "%APPDATA%\discord" (
 @ECHO.
 
 :: DEBUG
+::pause
 ::timeout /T 10
 
 GOTO :EOF
@@ -133,25 +140,19 @@ GOTO :EOF
 :: Functions
 :: -------------------------------
 
-:: -------------------------------
-:: function CopyPersistentDataFromTo
-::
-::     CopyPersistentDataFromTo(target folder, destination folder)
-::
-:: ex: %LOCALAPPDATA%/WRamdisk/persistent/APP/
-:: -------------------------------
+:CopyPersistentFromTo <target> <destination>
 
-:CopyPersistentDataFromTo
-
-:: Lets create the folders if they doesnt exist..
+@ECHO %ESC%[101;93m%ESC%[1L CopyPersistentFromTo %1 %2 %ESC%[0m
 
 :: Check if "target folder" doesnt exists, then do nothing..
 if not exist %1 ( 
+  @ECHO %ESC%[101;93m%ESC%[1L [ERROR] %1 folder does not exists.. %ESC%[0m
   GOTO :EOF
 )
 
 :: Check if "destination folder" exists
 if not exist %2 ( 
+  @ECHO %ESC%[101;93m%ESC%[1L [ERROR] creating folder %2 %ESC%[0m
   MD %2 2>NUL
 )
 
@@ -159,9 +160,11 @@ if not exist %2 (
 :: /R:5 => número de Repetições em cópias com falhas = 5
 :: /W:1 => tempo de espera entre as repetições = 1 segundo
 
-robocopy %1 %2 /MIR /E /COPYALL /R:5 /W:1 >nul 2>nul
+@ECHO %ESC%[101;93m%ESC%[1L [STATUS] copying files.. %ESC%[0m
 
-GOTO :EOF
+robocopy %1 %2 /MIR /E /R:5 /W:1 >nul 2>nul
+
+goto :EOF
 
 :: -------------------------------
 :: function setESC (colors)
